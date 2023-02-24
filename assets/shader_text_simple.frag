@@ -1,9 +1,9 @@
 #version 300 es
 
-precision highp float;
+precision mediump float;
 
 in vec2 TexCoords;
-out vec4 color;
+layout (location = 0) out vec4 color;
 
 uniform sampler2D stext;
 uniform vec3 textColor;

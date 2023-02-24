@@ -39,7 +39,7 @@ add_executable (office
 	)
 
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    set(USE_FLAGS "-s USE_SDL=2 -DWEBGL -s USE_FREETYPE=1 -s WASM=1 -s USE_WEBGL2=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 --embed-file=assets/Hack-Regular.ttf --embed-file=assets/program_2d_simple_color.frag --embed-file=assets/program_2d_simple_color.vert --embed-file=assets/program_2d_simple.frag --embed-file=assets/program_2d_simple.vert --embed-file=assets/shader_text_simple.frag --embed-file=assets/shader_text_simple.vert --embed-file=assets/texture_board.tex --embed-file=assets/texture_fired.tex --embed-file=assets/texture_floor.tex --embed-file=assets/texture_man1.tex --embed-file=assets/texture_wall.tex")
+    set(USE_FLAGS "-s USE_SDL=2 -DWEBGL -s USE_FREETYPE=1 -O2 -s WASM=1 -s USE_WEBGL2=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES3=1 --preload-file assets")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS}")

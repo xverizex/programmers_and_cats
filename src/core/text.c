@@ -7,6 +7,8 @@
 #include <core/text.h>
 #include <core/cmath.h>
 
+extern uint32_t screen_width;
+extern uint32_t screen_height;
 
 static FT_Library ft;
 static FT_Face face;
@@ -27,15 +29,10 @@ static float translate[16];
 static float w = 128.f;
 static float h = 128.f;
 
-extern uint32_t screen_width;
-extern uint32_t screen_height;
-
 void init_text ()
 {
-	w = screen_width;
-	h = screen_height;
 
-	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+	//glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 	FT_Init_FreeType (&ft);
 	int ret = FT_New_Face (ft, "assets/Hack-Regular.ttf", 0, &face);
 
@@ -51,22 +48,18 @@ void init_text ()
 
 	//printf ("error: %d\n", glGetError ());
 
-	glGenVertexArrays (1, &vao);
-	glGenBuffers (1, &vbo);
-	glBindVertexArray (vao);
-	glBindBuffer (GL_ARRAY_BUFFER, vbo);
-	glBufferData (GL_ARRAY_BUFFER, sizeof (float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray (0);
-	glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof (float), 0);
-	glBindBuffer (GL_ARRAY_BUFFER, 0);
-	glBindVertexArray (0);
+	
 }
 
 struct text *text_build (wchar_t *str, int pixel_size)
 {
-	struct text *text = calloc (1, sizeof (struct text));
+	struct text *text = malloc (sizeof (struct text));
+	text->chars = NULL;
+	text->size = 0;
 
 	int len = wcslen (str);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	for (int i = 0; i < len; i++) {
 		int ret = FT_Load_Char (face, str[i], FT_LOAD_RENDER);
@@ -74,10 +67,11 @@ struct text *text_build (wchar_t *str, int pixel_size)
 		uint32_t tex;
 		glGenTextures (1, &tex);
 		glBindTexture (GL_TEXTURE_2D, tex);
+
 		glTexImage2D (
 				GL_TEXTURE_2D,
 				0,
-				GL_RED,
+				GL_R8,
 				face->glyph->bitmap.width,
 				face->glyph->bitmap.rows,
 				0,
@@ -91,7 +85,9 @@ struct text *text_build (wchar_t *str, int pixel_size)
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		struct character *c = calloc (1, sizeof (struct character));
+		glBindTexture (GL_TEXTURE_2D, 0);
+
+		struct character *c = malloc (sizeof (struct character));
 		c->tex = tex;
 		c->bw = face->glyph->bitmap.width;
 		c->br = face->glyph->bitmap.rows;
@@ -109,17 +105,14 @@ struct text *text_build (wchar_t *str, int pixel_size)
 
 void text_render (struct text *text, float x, float y, float scale, float red, float green, float blue)
 {
-	math_ortho (projection, 0.f, w, 0.f, h, 0.f, 100.f);
+	math_ortho (projection, 0.f, screen_width, 0.f, screen_height, 0.f, 100.f);
 
 	glUseProgram (program);
-
-	glBindVertexArray (vao);
 
 	glActiveTexture(GL_TEXTURE0);
 
 	glUniform3f (uniform_color, red, green, blue);	
 	glUniformMatrix4fv (uniform_projection, 1, GL_FALSE, projection);
-	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
 
 	for (int i = 0; i < text->size; i++) {
@@ -131,33 +124,58 @@ void text_render (struct text *text, float x, float y, float scale, float red, f
 		float w = c->bw * scale;
 		float h = c->br * scale;
 
-		float vertices[6][4] = {
-			{ xpos, ypos + h, 0.0f, 0.0f },
-			{ xpos, ypos, 0.0f, 1.0f },
-			{ xpos + w, ypos, 1.0f, 1.0f },
-			{ xpos, ypos + h, 0.0f, 0.0f },
-			{ xpos + w, ypos, 1.0f, 1.0f },
-			{ xpos + w, ypos + h, 1.0f, 0.0f }
+		float vertices[12] = {
+			 xpos, ypos + h,
+			 xpos, ypos,
+			 xpos + w, ypos,
+			 xpos, ypos + h ,
+			 xpos + w, ypos ,
+			xpos + w, ypos + h 
 		};
 
-		glBindTexture (GL_TEXTURE_2D, c->tex);
+#if 0
+	float textures[12] = {
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f
+	};
 
-		glBindBuffer (GL_ARRAY_BUFFER, vbo);
-		glBufferSubData (GL_ARRAY_BUFFER, 0, sizeof (vertices), vertices);
-		glBindBuffer (GL_ARRAY_BUFFER, 0);
+#else
+		static float textures[12] = {
+			0.0f, 0.0f,
+			0.0f, 1.0f,
+			1.0f, 1.0f,
+			0.0f, 0.0f,
+			1.0f, 1.0f,
+			1.0f, 0.0f
+		};
+#endif
+
+		glBindTexture (GL_TEXTURE_2D, c->tex);
+		glUniform1i (uniform_tex, 0);
+
+
+		glEnableVertexAttribArray (0);
+		glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+
+		glEnableVertexAttribArray (1);
+		glVertexAttribPointer (1, 2, GL_FLOAT, GL_FALSE, 0, textures);
 
 		glDrawArrays (GL_TRIANGLES, 0, 6);
 
 		x += (c->advance >> 6) * scale;
+
 	}
 
-	glBindVertexArray (0);
 	glBindTexture (GL_TEXTURE_2D, 0);
 }
 
 void text_render_center (struct text *text, float w, float h, float scale, float red, float green, float blue)
 {
-	math_ortho (projection, 0.f, w, 0.f, h, 0.f, 100.f);
+	math_ortho (projection, 0.f, w, 0.f, h, -1.1f, 100.f);
 
 	glUseProgram (program);
 
@@ -214,10 +232,11 @@ void text_render_center (struct text *text, float w, float h, float scale, float
 		glBufferSubData (GL_ARRAY_BUFFER, 0, sizeof (vertices), vertices);
 		glBindBuffer (GL_ARRAY_BUFFER, 0);
 
-		glDrawArrays (GL_TRIANGLES, 0, 6);
 
 		x += (c->advance >> 6) * scale;
 	}
+			glDrawArrays (GL_TRIANGLES, 0, 6);
+
 
 	glBindVertexArray (0);
 	glBindTexture (GL_TEXTURE_2D, 0);

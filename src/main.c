@@ -6,6 +6,8 @@
 #include <core/cmath.h>
 #include <core/shaders.h>
 #include <GLES3/gl3.h>
+#include <locale.h>
+
 static int cur_level;
 static int x = 0;
 static int y = 0;
@@ -94,24 +96,32 @@ thread_sdl_events (void *data)
 	return 0;
 }
 
-uint32_t screen_width = 1920;
-uint32_t screen_height = 1080;
+uint32_t screen_width = 1280;
+uint32_t screen_height = 720;
 	
 int
 main (int argc, char **argv)
 {
+	setlocale (LC_ALL, "en_US.UTF-8");
+
 	int ret = SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 	if (ret != 0) {
 		fprintf (stderr, "SDL_Init: [%s]\n", SDL_GetError ());
 		exit (-1);
 	}
 
+	
 	cam = get_cam ();
 
+#ifndef WEBGL
+#if 1
 	SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute (SDL_GL_ALPHA_SIZE, 8);
+#endif
+#endif
+
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);

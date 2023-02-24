@@ -11,7 +11,7 @@ struct game_over *
 game_over_init ()
 {
 	struct game_over *pt = malloc (sizeof (struct game_over));
-	pt->background = rect_init (1024, 1024);
+	pt->background = rect_init (1300, 200);
 	rect_set_color (pt->background, 0xac / 255.f, 0xac / 255.f, 0xac / 255.f, 1.f);
 
 	return pt;
@@ -38,4 +38,5 @@ game_over_render (struct game_over *pt)
 	rect_render (pt->background);
 
 	text_render (pt->builded, screen_width / 2 - pt->builded->size * 28 / 2, screen_height / 2, 1, 0, 0, 0);
+
 }

@@ -33,9 +33,9 @@ extern uint32_t screen_height;
 #define SIZE_FLOOR_Y    9
 static struct floor ***floor;
 #ifdef WEBGL
-static uint32_t cur_scale = 2;  //4
+static uint32_t cur_scale = 3;  //4
 #else
-static uint32_t cur_scale = 4;
+static uint32_t cur_scale = 3;
 #endif
 static uint32_t shiftx = 2;
 static uint32_t shifty = 3;
@@ -320,6 +320,7 @@ level_office_0x0_load_resources ()
 
 	game_over = game_over_init ();
 	game_over_set_pos (game_over, screen_width / 2 - game_over->background->width / 2, screen_height / 2 - game_over->background->height / 2);
+
 
 	int startx = -(screen_width / 2);
 	int starty = (screen_height / 2);
