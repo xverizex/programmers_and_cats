@@ -89,6 +89,28 @@ human_destination (struct human *h, int oldx, int oldy, int dx, int dy)
 	h->dsty = dy;
 }
 
+void
+new_pos_and_tile (struct human *h, struct floor *f, struct floor *oldfloor)
+{
+	sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
+	h->index_path++;
+	int indx = h->index_path;
+	int yy = h->path->coord[indx].y;
+	int xx = h->path->coord[indx].x;
+	if (oldfloor->human == h) {
+		oldfloor->human = NULL;
+	}
+	h->tilex = h->path->coord[indx - 1].x;
+	h->tiley = h->path->coord[indx - 1].y;
+	h->oldtilex = h->tilex;
+	h->oldtiley = h->tiley;
+
+	h->path = NULL;
+	h->index_path = 0;
+
+	f->human = h;
+}
+
 static void
 human_walk_left_down (struct human *h, struct floor *f, int indx, struct floor *oldfloor)
 {
@@ -97,24 +119,7 @@ human_walk_left_down (struct human *h, struct floor *f, int indx, struct floor *
 			
 						
 	if (h->sprite->x >= f->sprite->x && h->sprite->y <= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 
 }
@@ -127,24 +132,7 @@ human_walk_right_down (struct human *h, struct floor *f, int indx, struct floor 
 
 			
 	if (h->sprite->x <= f->sprite->x && h->sprite->y <= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 
 }
@@ -156,26 +144,7 @@ human_walk_down (struct human *h, struct floor *f, int indx, struct floor *oldfl
 	h->sprite->cur_tex = anim_run (h->animation, WALK_DOWN, 0);
 			
 	if (h->sprite->y <= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-			
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 }
 
@@ -186,24 +155,7 @@ human_walk_up (struct human *h, struct floor *f, int indx, struct floor *oldfloo
 	h->sprite->cur_tex = anim_run (h->animation, WALK_UP, 0);
 
 	if (h->sprite->y >= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 }
 
@@ -214,24 +166,7 @@ human_walk_left_up (struct human *h, struct floor *f, int indx, struct floor *ol
 	h->sprite->cur_tex = anim_run (h->animation, WALK_LEFT_UP, 0);
 
 	if (h->sprite->y >= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 
 }
@@ -243,24 +178,7 @@ human_walk_right_up (struct human *h, struct floor *f, int indx, struct floor *o
 	h->sprite->cur_tex = anim_run (h->animation, WALK_RIGHT_UP, 0);
 
 	if (h->sprite->y >= f->sprite->y) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 }
 
@@ -271,24 +189,7 @@ human_walk_left (struct human *h, struct floor *f, int indx, struct floor *oldfl
 	h->sprite->cur_tex = anim_run (h->animation, WALK_LEFT, 0);
 
 	if (h->sprite->x >= f->sprite->x) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 }
 
@@ -299,24 +200,7 @@ human_walk_right (struct human *h, struct floor *f, int indx, struct floor *oldf
 	h->sprite->cur_tex = anim_run (h->animation, WALK_RIGHT, 0);
 
 	if (h->sprite->x <= f->sprite->x) {
-		sprite_set_pos (h->sprite, f->sprite->x, f->sprite->y, 0.f);
-		h->index_path++;
-		int indx = h->index_path;
-		int yy = h->path->coord[indx].y;
-		int xx = h->path->coord[indx].x;
-		if (oldfloor->human == h) {
-			oldfloor->human = NULL;
-		}
-		h->tilex = h->path->coord[indx - 1].x;
-		h->tiley = h->path->coord[indx - 1].y;
-		h->oldtilex = h->tilex;
-		h->oldtiley = h->tiley;
-		
-		h->path = NULL;
-		h->index_path = 0;
-
-		f->human = h;
-
+		new_pos_and_tile (h, f, oldfloor);
 	}
 }
 

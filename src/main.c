@@ -117,7 +117,6 @@ thread_sdl_events (void *data)
 		switch (event.type) {
 			case SDL_WINDOWEVENT:
 				{
-					printf ("event.window.event: %d\n", event.window.event);
 						if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 							screen_width = event.window.data1;
 							screen_height = event.window.data2;
