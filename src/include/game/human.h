@@ -50,7 +50,6 @@ struct human {
 };
 
 struct human *human_init(int *speed_time);
-void human_destination(struct human *h, int oldx, int oldy, int dx, int dy);
 void human_set_scale(struct human *h, float sc);
 void human_set_path(struct human *h, struct path *p);
 void human_step(struct human *h, int sizeh, int sizew, struct floor ***floor);

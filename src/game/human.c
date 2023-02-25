@@ -80,15 +80,6 @@ human_set_path (struct human *h, struct path *p)
 	h->path = p;
 }
 
-void 
-human_destination (struct human *h, int oldx, int oldy, int dx, int dy)
-{
-	h->tilex = oldx;
-	h->tiley = oldy;
-	h->dstx = dx;
-	h->dsty = dy;
-}
-
 void
 new_pos_and_tile (struct human *h, struct floor *f, struct floor *oldfloor)
 {
@@ -238,9 +229,6 @@ human_step (struct human *h, int sizeh, int sizew, struct floor ***floor)
 		
 		
 		floor_assign (f, h);
-
-		//human_destination (h, h->oldtilex, h->oldtiley, xx, yy);
-		/* unassign tile human */
 
 
 		if (h->sprite->x < f->sprite->x && h->sprite->y > f->sprite->y) {
